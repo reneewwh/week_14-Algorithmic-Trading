@@ -70,17 +70,77 @@ Open the Jupyter notebook. Restart the kernel, run the provided cells that corre
 
 In this section, you’ll tune, or adjust, the model’s input features to find the parameters that result in the best trading outcomes. (You’ll choose the best by comparing the cumulative products of the strategy returns.) To do so, complete the following steps:
 
+#### ADJUSTING SIZE OF TRAINING SETS
+
 1. Tune the training algorithm by adjusting the size of the training dataset. To do so, slice your data into different periods. Rerun the notebook with the updated parameters, and record the results in your `README.md` file. Answer the following question: What impact resulted from increasing or decreasing the training window?
 
     > **Hint** To adjust the size of the training dataset, you can use a different `DateOffset` value&mdash;for example, six months. Be aware that changing the size of the training dataset also affects the size of the testing dataset.
 
+##### Output [1]: 
+Code adjustment #1 from original:
+ohlcv_df=ohlcv_df[ohlcv_df.index.year.isin([2019, 2020])].copy()
+As the first experiment, I have sliced the data from 2019 -2021, omitting years before 2019. The cumulative actual returns is lower than the cumulative strategy return, this potentially indicates the recent year's returns has been relatively optimistic, which uplifted the predictions of strategy returns. 
+Please see plot <cumulative_plot_period_20192020.png>
+![plot_01](./Starter_Code/Plots/cumulative_plot_period_20192020.png)
+
+Code Adjustment #2 from original:
+ohlcv_df=ohlcv_df[(ohlcv_df.index.year ==2019) & ohlcv_df.index.month.isin([2,3,4,5,6,7])].copy()
+In this second experiment, i have extracted only 6 months worth of data in 2019. The test data (aka July) looks really off - not only the actual returns are below of strategy returns (based on modeling), but as well as they go on different direction whihc looks like it has potential overfitting. 
+
+Decreasing training window even though may potentially allow the model to become responsive to short-term changes, however based on the precision and recall score in the classification report, the accuruacy decreased significantly from the original. Perhaps it would be a better idea to test with increasing training window, and assess the overall f1_score to determine whether increasing training window is a good option.
+Please see plot <cumulative_plot_2019_6m.png>
+![plot_02](./Starter_Code/Plots/cumulative_plot_2019_6m.png)
+
+#### ADJUSTING SMA INPUTS FEATURES
 2. Tune the trading algorithm by adjusting the SMA input features. Adjust one or both of the windows for the algorithm. Rerun the notebook with the updated parameters, and record the results in your `README.md` file. Answer the following question: What impact resulted from increasing or decreasing either or both of the SMA windows?
+
+##### Output [2]: 
+(1)Code Adjustments:-
+short_window = 10
+long_window = 250
+In this experiment, i have increased both the SMA windows by x2.5. the f1 score has decreased as reflected across precision and recall respectively. In the graph, from mid-2019 to early 2020 - the predictions were far off with large discrepencies between the two results. However, the trend picked back up afte march in terms of trend directions. However, the discrepency of the returns remain large. 
+Please see plot <cumulative_plots_increasing_window>
+![plot_03](./Starter_Code/Plots/cumulative_plots_increasing_window.png)
+
+(2)Code Adjustments:-
+short_window = 80
+long_window = 100
+In this experiment, i have increased the short window closer to the long window. the f1 score further deteriorates - seem like it's the worst inptus out of the experiements i did.
+Please see plot <cumulative_plots_close_window>
+![plot_04](./Starter_Code/Plots/cumulative_plots_close_window.png)
+
+(3)Code Adjustments:-
+short_window = 4
+long_window = 250
+In this experiment, i have increased the long window to 250, while maintaining the short window. the f1-score remains in the 60s (low score), and the discrepencies are much higher than the experiements made (1) in this section. Strategy returns' fluctuations tend to react 'less vividly' comparing to the actuals. 
+Please see plot <cumulative_plots_4_250>
+![plot_05](./Starter_Code/Plots/cumulative_plots_4_250.png)
 
 3. Choose the set of parameters that best improved the trading algorithm returns. Save a PNG image of the cumulative product of the actual returns vs. the strategy returns, and document your conclusion in your `README.md` file.
 
+Date: 2018-2021
+Short_window = 5
+long_window = 300
+
+the returns tend to react correponsidingly to the actual returns even though strategy returns are evaluated higher than the actuals. 
+Please see plot <cumulative_plot_period_20192020>
+![plot_06](./Starter_Code/Plots/cumulative_plot_period_20192020.png)
+
+
+
+Date: 2018-2021
+Short_window = 1
+long_window = 80
+
+The strategy returns are slighlty underevaluated from end of 2020. however, they are still moving parallel direction. 
+
+Please see plot <cumulative_plot_1_80>
+![plot_06](./Starter_Code/Plots/cumulative_plot_1_80.png)
+
 ### Evaluate a New Machine Learning Classifier
 
-In this section, you’ll use the original parameters that the starter code provided. But, you’ll apply them to the performance of a second machine learning model. To do so, complete the following steps:
+In this section, you’ll use the original parameters that the starter code provided. But, you’ll apply them to the performance of a second machine learning
+To do so, complete the following steps:
 
 1. Import a new classifier, such as `AdaBoost`, `DecisionTreeClassifier`, or `LogisticRegression`. (For the full list of classifiers, refer to the [Supervised learning page](https://scikit-learn.org/stable/supervised_learning.html) in the scikit-learn documentation.)
 
